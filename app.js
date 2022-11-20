@@ -36,14 +36,33 @@ app.get('/users/:userId', async (req, res) => {
     }
     res.json(user);
 });
-// app.put('/users/:userId',async(req,res)=>{
-//     const newUserInfo = req.body;
-//     const {userId} = req.params;
-//
-//     const users = await fileService.reader();
-//     const user =await
-// })
+app.put('/users/:userId',async(req,res)=>{
+    const newUserInfo = req.body;
+    const {userId} = req.params;
 
+    const users = await fileService.reader();
+    const index=users.findIndex((user)=>user.id===+userId)
+
+    if (index === -1) {
+        return res.status(401).json(`User with id ${userId} not found`)
+    }
+    users[index] = {...users[index], newUserInfo};
+
+    await fileService.writer(users);
+    res.status(201).json(users[index])
+})
+app.delete('/users/:userId',async(req,res)=>{
+    const {userId} = req.params;
+    const users = await fileService.reader();
+    const index=users.findIndex((user)=>user.id===+userId)
+
+    if (index === -1) {
+        return res.status(401).json(`User with id ${userId} not found`)
+    }
+    users.splice(index, 1);
+    await fileService.writer(users);
+    res.sendStatus(204)
+})
 
 app.listen(5000, () => {
     console.log('Server listen 5000');
