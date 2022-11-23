@@ -1,4 +1,4 @@
-const userDb = require('../dataBase/users');
+const userDb = require('../dataBase/users.json');
 const ApiError = require('../error/ApiError');
 
 module.exports={
