@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const userRouter = require('./router/user.router');
@@ -22,5 +23,6 @@ app.use((err,req,res,next)=>{
 })
 
 app.listen(config.PORT ,()=>{
-    console.log(`server listen ${config.PORT}`)
+    console.log(`server listen ${config.PORT}`);
+    mongoose.connect(config.MONGO_URL);
 })
