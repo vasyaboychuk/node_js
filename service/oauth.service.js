@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const ApiError = require("../error/ApiError");
+const {ACCESS_SECRET, REFRESH_SECRET} = require("../config/config");
+const {tokenTypeEnum} = require("../enum");
 
 module.exports = {
     hashPassword: (password) => bcrypt.hash(password, 10),
@@ -13,14 +15,27 @@ module.exports = {
             throw new ApiError('Wrong email or password', 400)
         }
     },
-    generateAccessTokenPair:(dataToSign={})=>{
-        const accessToken = jwt.sign(dataToSign,'secretWord',{expiresIn:'15m'});
-        const refreshToken = jwt.sign(dataToSign,'secretWordRefresh',{expiresIn:'30d'});
+    generateAccessTokenPair: (dataToSign = {}) => {
+        const accessToken = jwt.sign(dataToSign, ACCESS_SECRET, {expiresIn: '15s'});
+        const refreshToken = jwt.sign(dataToSign, REFRESH_SECRET, {expiresIn: '30d'});
 
-        return{
+        return {
             accessToken,
             refreshToken
         }
+    },
+    checkToken: (token = '', tokenType = tokenTypeEnum.accessType) => {
+        try {
+            let secret = '';
+            if (tokenType === tokenTypeEnum.accessType) secret = ACCESS_SECRET;
+            else if (tokenType === tokenTypeEnum.refreshType) secret = REFRESH_SECRET;
+
+            return jwt.verify(token, secret)
+
+        } catch (e) {
+            throw new ApiError('Token not valid', 401)
+        }
+
     }
 
 
