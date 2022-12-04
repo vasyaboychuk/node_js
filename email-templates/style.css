@@ -1,0 +1,15 @@
+.header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    font-size: 30px;
+    background-color: limegreen;
+    color: white;
+    height: 100px;
+}
+.footer {
+    background-color: limegreen;
+    color: white;
+    height: 100px;
+}
