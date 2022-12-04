@@ -21,7 +21,7 @@ module.exports = {
     },
     refresh: async (req, res, next) => {
         try {
-            const {refreshToken,_user_id} = req.tokenInfo;
+            const {refreshToken, _user_id} = req.tokenInfo;
             await Oauth.deleteOne({refreshToken})
 
             const tokenPair = oauthService.generateAccessTokenPair({id: _user_id});
@@ -32,6 +32,27 @@ module.exports = {
         } catch (e) {
             next(e);
         }
+    },
+    logout: async (req, res, next) => {
+        try {
+            const {accessToken} = req.tokenInfo;
+            await Oauth.deleteOne({accessToken})
+
+            res.sendStatus(204)
+        } catch (e) {
+            next(e);
+        }
+    },
+    logoutAll: async (req, res, next) => {
+        try {
+            const { _user_id} = req.tokenInfo;
+            await Oauth.deleteMany({_user_id})
+
+
+            res.sendStatus(204)
+        } catch (e) {
+            next(e);
+        }
     }
 
-}
+};
