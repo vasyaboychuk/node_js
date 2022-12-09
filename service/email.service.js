@@ -1,12 +1,17 @@
 const nodemailer = require('nodemailer');
-const {NO_REPLY_EMAIL, NO_REPLY_EMAIL_PASSWORD} = require('../config/config');
-const EmailTemplates = require('email-templates');
+const hbs = require('nodemailer-express-handlebars');
 const path = require('path');
+
+const {NO_REPLY_EMAIL, NO_REPLY_EMAIL_PASSWORD, FRONTEND_URL} = require('../config/config');
 const emailTemplates = require('../email-templates/info');
 const ApiError = require("../error/ApiError");
 
-const sendEmail =  async (receiverEmail,emailAction,locals={}) => {
+
+
+const sendEmail = async (receiverEmail, emailAction, context = {}) => {
+
     const transporter = nodemailer.createTransport({
+        from:'No reply',
         service: 'gmail',
         auth: {
             user: NO_REPLY_EMAIL,
@@ -14,24 +19,33 @@ const sendEmail =  async (receiverEmail,emailAction,locals={}) => {
         }
     });
 
-     const templateInfo=emailTemplates[emailAction];
+    const templateInfo = emailTemplates[emailAction];
 
-    if (!templateInfo) {
-        throw new ApiError('wrong template',500)
+    if (!templateInfo?.subject || !templateInfo.templateName) {
+        throw new ApiError('wrong template', 500)
     }
 
-    const templateRenderer = new EmailTemplates({
-        views:{
-            root: path.join(process.cwd(), 'email-templates')
-        }
-    });
-    const html = await templateRenderer.render(templateInfo.templateName,locals);
+    const options = {
+        viewEngine: {
+            defaultLayout: 'main',
+            layoutsDir: path.join(process.cwd(), 'email-templates', 'layouts'),
+            partialsDir: path.join(process.cwd(), 'email-templates', 'partials'),
+            extname: '.hbs'
+        },
+        extName: '.hbs',
+        viewPath: path.join(process.cwd(), 'email-templates', 'views')
+    }
+
+    transporter.use('compile', hbs(options))
+
+
+    context.frontendURL = FRONTEND_URL;
 
     return transporter.sendMail({
-        from: 'No reply',
         to: receiverEmail,
         subject: templateInfo.subject,
-        html
+        template: templateInfo.templateName,
+        context
     })
 }
 module.exports = {

@@ -7,7 +7,7 @@ module.exports = {
         try {
             const {user, body} = req;
 
-            await emailService.sendEmail('boychuk98vasya@gmail.com',WELCOME,{userName:user.name})
+            await emailService.sendEmail(user.email,WELCOME,{userName:user.name})
 
             await oauthService.comparePasswords(user.password, body.password);
 
