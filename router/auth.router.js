@@ -1,11 +1,15 @@
 const router = require('express').Router();
 
 const controller = require('../controller/auth.controller');
-const middleware = require('../middleware/auth.middleware');
-const userMiddleware = require('../middleware/user.middleware');
+const mdlwr = require('../middleware/auth.middleware');
+const userMdlwr = require('../middleware/user.middleware');
+const authMdlwr = require('../middleware/auth.middleware');
 
-router.post('/login', middleware.checkIsBodyValid, userMiddleware.getUserDynamically('email'), controller.login)
+router.post('/login', mdlwr.isBodyValid, userMdlwr.getUserDynamically('email'), controller.login);
 
+router.post('/refresh', authMdlwr.checkRefreshToken, controller.refresh);
 
+router.post('/password/forgot', userMdlwr.getUserDynamically('email'), controller.forgotPassword);
+router.put('/password/forgot', authMdlwr.checkActionToken, authMdlwr.checkOldPasswords, controller.forgotPasswordAfterForgot);
 
 module.exports = router;

@@ -1,28 +1,24 @@
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const path = require('path');
-
-const {NO_REPLY_EMAIL, NO_REPLY_EMAIL_PASSWORD, FRONTEND_URL} = require('../config/config');
+const { NO_REPLY_EMAIL, NO_REPLY_EMAIL_PASSWORD, FRONTEND_URL } = require('../config/config');
 const emailTemplates = require('../email-templates/info');
 const ApiError = require("../error/ApiError");
 
-
-
-const sendEmail = async (receiverEmail, emailAction, context = {}) => {
-
+const sendEmail = async (receiverMail, emailAction, context = {}) => {
     const transporter = nodemailer.createTransport({
-        from:'No reply',
+        from: 'No reply',
         service: 'gmail',
         auth: {
             user: NO_REPLY_EMAIL,
-            pass: NO_REPLY_EMAIL_PASSWORD,
+            pass: NO_REPLY_EMAIL_PASSWORD
         }
     });
 
     const templateInfo = emailTemplates[emailAction];
 
     if (!templateInfo?.subject || !templateInfo.templateName) {
-        throw new ApiError('wrong template', 500)
+        throw new ApiError('Wrong template', 500);
     }
 
     const options = {
@@ -30,24 +26,24 @@ const sendEmail = async (receiverEmail, emailAction, context = {}) => {
             defaultLayout: 'main',
             layoutsDir: path.join(process.cwd(), 'email-templates', 'layouts'),
             partialsDir: path.join(process.cwd(), 'email-templates', 'partials'),
-            extname: '.hbs'
+            extname: '.hbs',
         },
         extName: '.hbs',
-        viewPath: path.join(process.cwd(), 'email-templates', 'views')
+        viewPath: path.join(process.cwd(), 'email-templates', 'views'),
     }
 
-    transporter.use('compile', hbs(options))
-
-
+    transporter.use('compile', hbs(options));
     context.frontendURL = FRONTEND_URL;
 
+
     return transporter.sendMail({
-        to: receiverEmail,
+        to: receiverMail,
         subject: templateInfo.subject,
         template: templateInfo.templateName,
-        context
-    })
-}
+        context,
+    });
+};
+
 module.exports = {
-    sendEmail
-}
+    sendEmail,
+};

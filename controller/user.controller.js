@@ -4,53 +4,54 @@ const oauthService = require("../service/oauth.service");
 module.exports = {
     getAllUsers: async (req, res, next) => {
         try {
-            const users = await User.find();
-            res.json(users)
-        } catch (e) {
-            next(e)
-        }
+            const users = await User.find({});
 
+            res.json(users);
+        } catch (e) {
+            next(e);
+        }
     },
+
     getUserById: (req, res, next) => {
         try {
             res.json(req.user);
         } catch (e) {
             next(e)
         }
-
     },
+
     updateUser: async (req, res, next) => {
         try {
             const newUserInfo = req.body;
             const userId = req.params.userId;
 
-            await User.findByIdAndUpdate(userId, newUserInfo)
-            res.json('updated');
+            await User.findByIdAndUpdate(userId, newUserInfo);
+
+            res.json('Updated')
         } catch (e) {
-            next(e)
+            next(e);
         }
     },
-    create: async (req, res, next) => {
-        try {
 
+    createUser: async (req, res, next) => {
+        try {
             const hashPassword = await oauthService.hashPassword(req.body.password);
 
-            const newUser = await User.create({...req.body, password: hashPassword});
+            await User.create({ ...req.body, password: hashPassword });
 
-            res.status(201).json(newUser)
+            res.status(201).json('Ok')
         } catch (e) {
-            next(e)
+            next(e);
         }
     },
-    deleteUser: async (req, res, next) => {
-        try {
-            const userId = req.params.userId;
 
-            await User.findByIdAndDelete(userId);
-            res.json('deleted')
+    deleteUserById: async (req, res, next) => {
+        try {
+            await User.deleteOne({ _id: req.params.userId });
+
+            res.status(204).send('Ok')
         } catch (e) {
-            next(e)
+            next(e);
         }
     }
-
 }
