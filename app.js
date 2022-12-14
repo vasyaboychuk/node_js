@@ -1,10 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const swaggerUI = require('swagger-ui-express');
 require('dotenv').config();
 
 
 const userRouter = require('./router/user.router');
 const authRouter = require('./router/auth.router');
+const swaggerJson = require('./swagger.json');
 
 const config = require('./config/config');
 const {cronRunner} = require("./cron");
@@ -17,6 +19,7 @@ app.use(express.urlencoded({extended: true}))
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerJson));
 
 //для обробки помилок
 app.use((err,req,res,next)=>{

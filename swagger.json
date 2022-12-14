@@ -1,0 +1,113 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "june-2022"
+  },
+  "paths": {
+    "/users/{usersID}": {
+      "get": {
+        "description": "Get user by id",
+        "tags": [
+          "User"
+        ],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "usersID",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Authorizations",
+            "in": "header",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "schema": {
+              "$ref": "#/definitions/SingleUser"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Update user",
+        "tags": [
+          "User"
+        ],
+        "operationId": "updateUserById",
+        "parameters": [
+          {
+            "name": "email",
+            "required": false,
+            "type": "string",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User was updated",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ApiError": {
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 400
+        },
+        "message": {
+          "type": "string",
+          "example": "something went wrong"
+        }
+      }
+    },
+    "SingleUser": {
+      "properties": {
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Vasyl"
+            },
+            "age": {
+              "type": "integer",
+              "example": 19
+            },
+            "email": {
+              "type": "string",
+              "example": "vasyl@gmail.com"
+            }
+          }
+        }
+      }
+    }
+  }
+}
