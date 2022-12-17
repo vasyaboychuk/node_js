@@ -1,5 +1,6 @@
 const User = require("../dataBase/User");
 const oauthService = require("../service/oauth.service");
+const s3Service = require('../service/s3.service');
 
 module.exports = {
     getAllUsers: async (req, res, next) => {
@@ -46,11 +47,24 @@ module.exports = {
 
     deleteUserById: async (req, res, next) => {
         try {
-            await User.deleteOne({ _id: req.params.userId });
+            await User.deleteOne({_id: req.params.userId});
 
             res.status(204).send('Ok')
         } catch (e) {
             next(e);
         }
+    },
+    uploadAvatar: async (req, res, next) => {
+        try {
+            console.log(req.files);
+            const uploadedData = await s3Service.uploadPublicFile(req.files.avatar, 'user', req.user._id);
+
+            const updatedUser = await User.findByIdAndUpdate(req.user._id, {avatar: uploadedData.Location}, {new: true});
+
+            res.json(updatedUser)
+        } catch (e) {
+            next(e);
+        }
+
     }
 }
