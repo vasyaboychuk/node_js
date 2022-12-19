@@ -1,13 +1,16 @@
 const User = require("../dataBase/User");
 const oauthService = require("../service/oauth.service");
 const s3Service = require('../service/s3.service');
+const {userRepository} = require("../repository");
+const {userPresenter} = require("../presenter");
 
 module.exports = {
     getAllUsers: async (req, res, next) => {
         try {
-            const users = await User.find({});
+            const data = await userRepository.find(req.query);
+            data.users = userPresenter.normalizeMany(data.users)
 
-            res.json(users);
+            res.json(data);
         } catch (e) {
             next(e);
         }
